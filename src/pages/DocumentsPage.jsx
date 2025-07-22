@@ -9,14 +9,14 @@ const DocumentsPage = () => {
     const [documents, setDocuments] = useState([]);
     const [uploading, setUploading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
-    const { organizationId } = useSelector((state) => state.auth?.user);
+    const { organization_id } = useSelector((state) => state.auth?.user);
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
     // Fetch documents for the organization
     const fetchDocuments = async () => {
         try {
-            const response = await apiClient.get(`/documents?organizationId=${organizationId}`);
+            const response = await apiClient.get(`/documents?organization_id=${organization_id}`);
             if (response.data.success) {
                 setDocuments(response.data.documents);
             } else {
@@ -29,10 +29,10 @@ const DocumentsPage = () => {
     };
 
     useEffect(() => {
-        if (organizationId) {
+        if (organization_id) {
             fetchDocuments();
         }
-    }, [organizationId]);
+    }, [organization_id]);
 
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
@@ -52,7 +52,7 @@ const DocumentsPage = () => {
             // Append other form data
             formDataToSend.append('fileName', formData.fileName);
             formDataToSend.append('description', formData.description);
-            formDataToSend.append('organizationId', organizationId);
+            formDataToSend.append('organization_id', organization_id);
 
             const response = await apiClient.post('/uploadDocument', formDataToSend, {
                 headers: {

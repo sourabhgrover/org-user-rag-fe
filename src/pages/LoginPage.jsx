@@ -15,7 +15,7 @@ const LoginPage = () => {
     // Redirect if user is already logged in
     useEffect(() => {
         if (isAuthenticated) {
-            if (user?.isAdmin) {
+            if (user?.is_admin) {
                 navigate('/dashboard');
             } else {
                 navigate('/user-dashboard');
@@ -39,7 +39,7 @@ const LoginPage = () => {
                 // Prepare user data with role
                 const userData = {
                     ...data.user,
-                    role: data.user.isAdmin ? 'admin' : 'user'
+                    role: data.user.is_admin ? 'admin' : 'user'
                 };
 
                 // Dispatch success with both token and user data
@@ -50,7 +50,7 @@ const LoginPage = () => {
 
                 toast.success('Login successful!');
                 // Redirect based on role
-                if (data.user.isAdmin) {
+                if (data.user.is_admin) {
                     navigate('/dashboard');
                 } else {
                     navigate('/user-dashboard');

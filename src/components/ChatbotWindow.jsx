@@ -7,14 +7,14 @@ export default function ChatbotWindow() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [responseLoading, setReponseLoading] = useState(false);
-    const { organizationId } = useSelector(state => state.auth?.user);
+    const { organization_id } = useSelector(state => state.auth?.user);
     const sendMessage = async () => {
         if (input.trim()) {
 
             // if (!query) return alert("Please enter a query");
             const formData = new FormData();
             formData.append("query", input);
-            formData.append("orgId", organizationId);
+            formData.append("orgId", organization_id);
             setMessages(prev => [...prev, { text: input, sender: 'user' }]);
             try {
                 setReponseLoading(true);

@@ -22,7 +22,7 @@ const authSlice = createSlice({
             state.isAuthenticated = true;
             state.user = action.payload.user;
             state.token = action.payload.token;
-            state.role = action.payload.user?.isAdmin ? 'admin' : 'user';
+            state.role = action.payload.user?.is_admin ? 'admin' : 'user';
             state.error = null;
         },
         loginFailure: (state, action) => {

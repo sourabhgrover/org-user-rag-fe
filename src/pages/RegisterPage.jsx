@@ -7,7 +7,7 @@ import apiClient from '../../utils/apiConfig';
 import useToast from '../hooks/useToast.jsx';
 import { useDispatch } from 'react-redux';
 import { loginFailure, loginStart, loginSuccess } from '../store/slices/authSlice.js';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
     const dispatch = useDispatch();
@@ -37,12 +37,12 @@ const RegisterPage = () => {
             dispatch(loginSuccess({
                 user: result.user,
                 token: result.token,
-                role: result.user.isAdmin ? 'admin' : 'user'
+                role: result.user.is_admin ? 'admin' : 'user'
             }));
             showSuccess('Organization created successfully');
             debugger
             // Redirect based on role
-            if (result.user.isAdmin) {
+            if (result.user.is_admin) {
                 navigate('/dashboard');
             } else {
                 navigate('/dashboard/chatbots');
@@ -177,9 +177,9 @@ const RegisterPage = () => {
                     {/* Login Link */}
                     <p className="mt-4 text-center text-sm text-white">
                         Already have an account?{' '}
-                        <a href="/login" className="text-green-400 hover:text-green-300 font-medium">
+                        <Link to="/login" className="text-green-400 hover:text-green-300 font-medium">
                             Sign in
-                        </a>
+                        </Link>
                     </p>
                 </div>                
             </div>

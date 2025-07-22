@@ -2,19 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
-import apiClient from '../utils/apiConfig';
+import apiClient from '../../utils/apiConfig';
 
 const UsersPage = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [users, setUsers] = useState([]);
-    const { organizationId } = useSelector((state) => state.auth?.user);
+    const { organization_id } = useSelector((state) => state.auth?.user);
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
     // Fetch users for the organization
     const fetchUsers = async () => {
         try {
-            const response = await apiClient.get(`/users?organizationId=${organizationId}`);
+            const response = await apiClient.get(`/user?organization_id=${organization_id}`);
             if (response.data.success) {
                 setUsers(response.data.data);
             } else {
@@ -27,18 +27,18 @@ const UsersPage = () => {
     };
 
     useEffect(() => {
-        if (organizationId) {
+        if (organization_id) {
             fetchUsers();
         }
-    }, [organizationId]);
+    }, [organization_id]);
 
     const onSubmit = async (formData) => {
         try {
-            // Add organizationId to the user data
+            // Add organization_id to the user data
             const userData = {
                 ...formData,
-                isAdmin: formData.role === 'admin',
-                organizationId,
+                is_admin: formData.role === 'admin',
+                organization_id,
                 status: 'active'
             };
 
@@ -61,7 +61,7 @@ const UsersPage = () => {
     };
 
     // Filter users by organization
-    const organizationUsers = users.filter(user => user.organizationId === organizationId);
+    const organizationUsers = users.filter(user => user.organization_id === organization_id);
 
     return (
         <div className="space-y-6">
