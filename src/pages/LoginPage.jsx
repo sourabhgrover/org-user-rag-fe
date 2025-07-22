@@ -29,9 +29,8 @@ const LoginPage = () => {
         try {
             dispatch(loginStart());
             const response = await apiClient.post('/token', formData);
-            const { success, data, message } = response.data;
-            debugger
-            if (success) {
+            const { status, data, message } = response.data;
+            if (status === 'success') {
                 // Ensure we have the token in the response data
                 if (!data.token) {
                     throw new Error('No token received from server');
