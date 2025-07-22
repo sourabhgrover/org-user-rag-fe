@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginStart, loginSuccess, loginFailure } from '../store/slices/authSlice';
-import apiClient from '../utils/apiConfig';
+import apiClient from '../../utils/apiConfig';
 import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
@@ -28,7 +28,7 @@ const LoginPage = () => {
     const onSubmit = async (formData) => {
         try {
             dispatch(loginStart());
-            const response = await apiClient.post('/login', formData);
+            const response = await apiClient.post('/token', formData);
             const { success, data, message } = response.data;
             debugger
             if (success) {
