@@ -16,9 +16,9 @@ const DocumentsPage = () => {
     // Fetch documents for the organization
     const fetchDocuments = async () => {
         try {
-            const response = await apiClient.get(`/documents?organization_id=${organization_id}`);
-            if (response.data.success) {
-                setDocuments(response.data.documents);
+            const response = await apiClient.get(`doc/${organization_id}`);
+            if (response.data.status === 'success') {
+                setDocuments(response.data.data);
             } else {
                 toast.error('Failed to fetch documents');
             }
@@ -44,26 +44,21 @@ const DocumentsPage = () => {
             setUploading(true);
             const formDataToSend = new FormData();
             
-            // Append each file to FormData
+            // Append each file to FormData with the name 'file'
             selectedFiles.forEach((file) => {
-                formDataToSend.append('pdfs', file);
+                formDataToSend.append('file', file);
             });
 
-            // Append other form data
-            formDataToSend.append('fileName', formData.fileName);
-            formDataToSend.append('description', formData.description);
-            formDataToSend.append('organization_id', organization_id);
-
-            const response = await apiClient.post('/uploadDocument', formDataToSend, {
+            const response = await apiClient.post(`doc/?organization_id=${organization_id}`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
                 withCredentials: true,
             });
 
-            const { success, message } = response.data;
+            const { status, message } = response.data;
             
-            if (success) {
+            if (status === 'success') {
                 toast.success(message || 'Documents uploaded successfully!');
                 setIsUploadModalOpen(false);
                 reset();
@@ -108,10 +103,10 @@ const DocumentsPage = () => {
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Save As</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Folder</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unique Filename</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Path</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Upload Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -125,15 +120,12 @@ const DocumentsPage = () => {
                                             </svg>
                                         </div>
                                         <div className="ml-4">
-                                            <div className="text-sm font-medium text-gray-900">{doc.originalName}</div>
+                                            <div className="text-sm font-medium text-gray-900">{doc.name}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">{doc.name}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">{doc.description}</div>
+                                    <div className="text-sm text-gray-900">{doc.unique_filename}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-900">
@@ -142,10 +134,9 @@ const DocumentsPage = () => {
                                         </a>
                                     </div>
                                 </td>
-                               
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-900">
-                                        {new Date(doc.uploadDate).toLocaleDateString()}
+                                        {new Date(doc.uploadedAt).toLocaleDateString()}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -172,30 +163,6 @@ const DocumentsPage = () => {
                             </button>
                         </div>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">File Name</label>
-                                <input
-                                    type="text"
-                                    {...register('fileName', { required: 'Folder name is required' })}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                />
-                                {errors.fileName && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.fileName.message}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Description</label>
-                                <input
-                                    type="text"
-                                    {...register('description')}
-                                    placeholder="Enter a description for these documents"
-                                    rows={3}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                />
-                                {errors.description && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
-                                )}
-                            </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Select PDF Files</label>
                                 <input
