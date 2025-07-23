@@ -14,7 +14,7 @@ const UsersPage = () => {
     // Fetch users for the organization
     const fetchUsers = async () => {
         try {
-            const response = await apiClient.get(`/user?organization_id=${organization_id}`);
+            const response = await apiClient.get(`user?organization_id=${organization_id}`);
             if (response.data.status === 'success') {
                 setUsers(response.data.data);
             } else {
@@ -111,8 +111,14 @@ const UsersPage = () => {
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                                    <button className="text-red-600 hover:text-red-900">Delete</button>
+                                    {!user.is_admin ? (
+                                        <>
+                                            <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
+                                            <button className="text-red-600 hover:text-red-900">Delete</button>
+                                        </>
+                                    ) : (
+                                        <span className="text-gray-400 text-sm">Protected Admin</span>
+                                    )}
                                 </td>
                             </tr>
                         ))}
