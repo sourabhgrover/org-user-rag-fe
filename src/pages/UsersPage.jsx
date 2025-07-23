@@ -40,13 +40,14 @@ const UsersPage = () => {
                 last_name: formData.lastName,
                 username: formData.username,
                 email: formData.email,
+                password: formData.password,
                 gender: formData.gender || 'Other',
-                dob: formData.dob || '1990-01-01',
+                dob: formData.dob || '1990-01-15',
                 is_admin: formData.role === 'admin',
                 organization_id
             };
 
-            const response = await apiClient.post('/createUser', userData);
+            const response = await apiClient.post('user', userData);
             const { status, message } = response.data;
             
             if (status === 'success') {
@@ -184,10 +185,28 @@ const UsersPage = () => {
                                 )}
                             </div>
                             <div>
+                                <label className="block text-sm font-medium text-gray-700">Password</label>
+                                <input
+                                    type="password"
+                                    {...register('password', { 
+                                        required: 'Password is required',
+                                        minLength: {
+                                            value: 8,
+                                            message: 'Password must be at least 8 characters'
+                                        }
+                                    })}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                                {errors.password && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                                )}
+                            </div>
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700">Gender</label>
                                 <select
                                     {...register('gender')}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    defaultValue="Other"
                                 >
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -200,6 +219,7 @@ const UsersPage = () => {
                                     type="date"
                                     {...register('dob')}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    defaultValue="1990-01-15"
                                 />
                             </div>
                             <div>
@@ -207,6 +227,7 @@ const UsersPage = () => {
                                 <select
                                     {...register('role', { required: 'Role is required' })}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    defaultValue="user"
                                 >
                                     <option value="user">User</option>
                                     <option value="admin">Admin</option>
