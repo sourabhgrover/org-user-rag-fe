@@ -15,7 +15,7 @@ const UsersPage = () => {
     const fetchUsers = async () => {
         try {
             const response = await apiClient.get(`/user?organization_id=${organization_id}`);
-            if (response.data.success) {
+            if (response.data.status === 'success') {
                 setUsers(response.data.data);
             } else {
                 toast.error('Failed to fetch users');
@@ -36,16 +36,20 @@ const UsersPage = () => {
         try {
             // Add organization_id to the user data
             const userData = {
-                ...formData,
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                username: formData.username,
+                email: formData.email,
+                gender: formData.gender || 'Other',
+                dob: formData.dob || '1990-01-01',
                 is_admin: formData.role === 'admin',
-                organization_id,
-                status: 'active'
+                organization_id
             };
 
             const response = await apiClient.post('/createUser', userData);
-            const { success, message } = response.data;
+            const { status, message } = response.data;
             
-            if (success) {
+            if (status === 'success') {
                 toast.success(message || 'User created successfully!');
                 setIsCreateModalOpen(false);
                 reset();
@@ -90,9 +94,9 @@ const UsersPage = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {organizationUsers.map((user) => (
-                            <tr key={user.id}>
+                            <tr key={user._id}>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-medium text-gray-900">{user.firstName + ' ' + user.lastName}</div>
+                                    <div className="text-sm font-medium text-gray-900">{user.first_name + ' ' + user.last_name}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-500">{user.username}</div>
@@ -101,8 +105,8 @@ const UsersPage = () => {
                                     <div className="text-sm text-gray-500">{user.email}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        {user.role}
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.is_admin ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                                        {user.is_admin ? 'Admin' : 'User'}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -178,6 +182,25 @@ const UsersPage = () => {
                                 {errors.email && (
                                     <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
                                 )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Gender</label>
+                                <select
+                                    {...register('gender')}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                >
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+                                <input
+                                    type="date"
+                                    {...register('dob')}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Role</label>
