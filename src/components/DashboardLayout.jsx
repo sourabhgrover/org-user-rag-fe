@@ -63,7 +63,11 @@ const DashboardLayout = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                                 </svg>
                             </button>
-                            <img src="/inkpotlogo.png" alt="Logo" className="h-12 w-12 rounded-full" />
+                            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2L2 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-10-5z"/>
+                                </svg>
+                            </div>
                         </div>
 
                         {/* Profile Dropdown */}
@@ -72,11 +76,11 @@ const DashboardLayout = () => {
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                                 className="flex items-center focus:outline-none"
                             >
-                                <img
-                                    src="https://avatar.iran.liara.run/public/boy?username=Ash"
-                                    alt="Profile"
-                                    className="w-10 h-10 rounded-full"
-                                />
+                                <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </div>
                             </button>
 
                             <AnimatePresence>
