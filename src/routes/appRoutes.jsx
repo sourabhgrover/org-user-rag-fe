@@ -6,6 +6,7 @@ import LoginPage from '../pages/LoginPage.jsx';
 import Layout from '../pages/Layout.jsx';
 import Dashboard from '../pages/Dashboard.jsx';
 import UsersPage from '../pages/UsersPage.jsx';
+import ChatbotsPage from '../pages/ChatbotsPage.jsx';
 import PrivateRoute from '../components/PrivateRoute.jsx';
 import PublicRoute from '../components/PublicRoute.jsx';
 import DashboardLayout from '../components/DashboardLayout.jsx';
@@ -64,7 +65,7 @@ export default function AppRoutes() {
             ),
             children: [
                 { index: true, element: <Dashboard /> },
-                { path: 'chatbots', element: <div>Chatbots Page</div> },
+                { path: 'chatbots', element: <ChatbotsPage /> },
                 { path: 'documents', element: <DocumentsPage /> },
                 { path: 'users', element: <UsersPage /> },
                 { path: 'settings', element: <div>Settings Page</div> },
