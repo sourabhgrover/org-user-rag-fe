@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../../utils/apiConfig';
 
 const DocumentsPage = () => {
@@ -10,6 +11,7 @@ const DocumentsPage = () => {
     const [uploading, setUploading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const { organization_id } = useSelector((state) => state.auth?.user);
+    const navigate = useNavigate();
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -84,6 +86,15 @@ const DocumentsPage = () => {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };*/
 
+    const handleChatWithDocument = (documentId, documentName) => {
+        // Store the selected document in sessionStorage to be picked up by ChatbotsPage
+        sessionStorage.setItem('selectedDocumentId', documentId);
+        sessionStorage.setItem('selectedDocumentName', documentName);
+        
+        // Navigate to chatbots page
+        navigate('/dashboard/chatbots');
+    };
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -140,6 +151,12 @@ const DocumentsPage = () => {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button 
+                                        onClick={() => handleChatWithDocument(doc.id, doc.name)}
+                                        className="text-green-600 hover:text-green-900 mr-3"
+                                    >
+                                        Chat
+                                    </button>
                                     <button className="text-blue-600 hover:text-blue-900 mr-3">View</button>
                                     <button className="text-red-600 hover:text-red-900">Delete</button>
                                 </td>

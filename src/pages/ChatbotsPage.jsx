@@ -7,6 +7,8 @@ import apiClient from '../../utils/apiConfig';
 const ChatbotsPage = () => {
     const [messages, setMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [documents, setDocuments] = useState([]);
+    const [selectedDocument, setSelectedDocument] = useState('');
     const messagesEndRef = useRef(null);
     const { organization_id } = useSelector((state) => state.auth?.user);
 
@@ -32,6 +34,56 @@ const ChatbotsPage = () => {
         ]);
     }, []);
 
+    // Fetch documents for the organization
+    const fetchDocuments = async () => {
+        try {
+            const response = await apiClient.get(`doc/${organization_id}`);
+            if (response.data.status === 'success') {
+                setDocuments(response.data.data);
+            } else {
+                console.error('Failed to fetch documents');
+            }
+        } catch (error) {
+            console.error('Error fetching documents:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (organization_id) {
+            fetchDocuments();
+        }
+        
+        // Check if a document was selected from the Documents page
+        const selectedDocId = sessionStorage.getItem('selectedDocumentId');
+        const selectedDocName = sessionStorage.getItem('selectedDocumentName');
+        
+        if (selectedDocId && selectedDocName) {
+            setSelectedDocument(selectedDocId);
+            
+            // Add a system message indicating which document is selected
+            const systemMessage = {
+                id: Date.now(),
+                text: `Ready to chat about: ${selectedDocName}`,
+                sender: 'system',
+                timestamp: new Date().toISOString()
+            };
+            
+            setMessages([
+                {
+                    id: 1,
+                    text: "Hello! I'm your AI assistant. How can I help you today?",
+                    sender: 'bot',
+                    timestamp: new Date().toISOString()
+                },
+                systemMessage
+            ]);
+            
+            // Clear the session storage
+            sessionStorage.removeItem('selectedDocumentId');
+            sessionStorage.removeItem('selectedDocumentName');
+        }
+    }, [organization_id]);
+
     const onSubmit = async (formData) => {
         const userMessage = formData.message.trim();
         if (!userMessage) return;
@@ -49,10 +101,17 @@ const ChatbotsPage = () => {
         setIsLoading(true);
 
         try {
-            const response = await apiClient.post('/qa/ask', {
+            const requestData = {
                 question: userMessage,
                 // organization_id
-            });
+            };
+
+            // Add document_id if a specific document is selected
+            if (selectedDocument) {
+                requestData.document_id = selectedDocument;
+            }
+
+            const response = await apiClient.post('/qa/ask', requestData);
 
             if (response.data.status === 'success') {
                 // Add bot response to chat
@@ -101,6 +160,29 @@ const ChatbotsPage = () => {
         ]);
     };
 
+    const handleDocumentChange = (e) => {
+        setSelectedDocument(e.target.value);
+        // Add a system message when document selection changes
+        if (e.target.value) {
+            const selectedDoc = documents.find(doc => doc.id === e.target.value);
+            const systemMessage = {
+                id: Date.now(),
+                text: `Now searching in: ${selectedDoc?.name || 'Selected Document'}`,
+                sender: 'system',
+                timestamp: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, systemMessage]);
+        } else {
+            const systemMessage = {
+                id: Date.now(),
+                text: "Now searching in: All Documents",
+                sender: 'system',
+                timestamp: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, systemMessage]);
+        }
+    };
+
     return (
         <div className="flex flex-col h-[calc(100vh-120px)]">
             {/* Header */}
@@ -109,12 +191,32 @@ const ChatbotsPage = () => {
                     <h1 className="text-2xl font-bold text-gray-800">AI Chatbot</h1>
                     <p className="text-sm text-gray-600">Chat with your organization's AI assistant</p>
                 </div>
-                <button
-                    onClick={clearChat}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                    Clear Chat
-                </button>
+                <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                        <label htmlFor="document-select" className="text-sm font-medium text-gray-700">
+                            Search in:
+                        </label>
+                        <select
+                            id="document-select"
+                            value={selectedDocument}
+                            onChange={handleDocumentChange}
+                            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <option value="">All Documents</option>
+                            {documents.map((doc) => (
+                                <option key={doc.id} value={doc.id}>
+                                    {doc.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <button
+                        onClick={clearChat}
+                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                        Clear Chat
+                    </button>
+                </div>
             </div>
 
             {/* Messages Container */}
@@ -129,12 +231,18 @@ const ChatbotsPage = () => {
                                 className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-2 rounded-lg ${
                                     message.sender === 'user'
                                         ? 'bg-blue-600 text-white'
+                                        : message.sender === 'system'
+                                        ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
                                         : 'bg-white text-gray-800 border border-gray-200'
                                 }`}
                             >
                                 <p className="text-sm md:text-base whitespace-pre-wrap">{message.text}</p>
                                 <p className={`text-xs mt-1 ${
-                                    message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                                    message.sender === 'user' 
+                                        ? 'text-blue-100' 
+                                        : message.sender === 'system'
+                                        ? 'text-yellow-600'
+                                        : 'text-gray-500'
                                 }`}>
                                     {new Date(message.timestamp).toLocaleTimeString([], { 
                                         hour: '2-digit', 
