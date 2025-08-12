@@ -7,6 +7,7 @@ import apiClient from '../../utils/apiConfig';
 const ChatbotsPage = () => {
     const [messages, setMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isTyping, setIsTyping] = useState(false);
     const [documents, setDocuments] = useState([]);
     const [selectedDocument, setSelectedDocument] = useState('');
     const messagesEndRef = useRef(null);
@@ -21,6 +22,30 @@ const ChatbotsPage = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // Typing animation function
+    const typeMessage = (text, messageId) => {
+        setIsTyping(true);
+        let currentIndex = 0;
+        const typingSpeed = 30; // milliseconds per character
+        
+        const typeChar = () => {
+            if (currentIndex < text.length) {
+                setMessages(prev => prev.map(msg => 
+                    msg.id === messageId 
+                        ? { ...msg, text: text.substring(0, currentIndex + 1) }
+                        : msg
+                ));
+                currentIndex++;
+                setTimeout(typeChar, typingSpeed);
+            } else {
+                setIsTyping(false);
+            }
+        };
+        
+        // Start typing
+        typeChar();
+    };
 
     // Initialize with a welcome message
     useEffect(() => {
@@ -114,14 +139,19 @@ const ChatbotsPage = () => {
             const response = await apiClient.post('/qa/ask', requestData);
 
             if (response.data.status === 'success') {
-                // Add bot response to chat
+                // Add bot response to chat with empty text first
                 const botMessage = {
                     id: Date.now() + 1,
-                    text: response.data.data.answer,
+                    text: '',
                     sender: 'bot',
                     timestamp: new Date().toISOString()
                 };
                 setMessages(prev => [...prev, botMessage]);
+                
+                // Start typing animation
+                setTimeout(() => {
+                    typeMessage(response.data.data.answer, botMessage.id);
+                }, 500); // Small delay before starting to type
             } else {
                 // Add error message as bot response
                 const errorMessage = {
@@ -186,36 +216,44 @@ const ChatbotsPage = () => {
     return (
         <div className="flex flex-col h-[calc(100vh-120px)]">
             {/* Header */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-white">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-800">AI Chatbot</h1>
-                    <p className="text-sm text-gray-600">Chat with your organization's AI assistant</p>
+            <div className="border-b border-gray-200 bg-white">
+                {/* Title Section */}
+                <div className="px-4 py-3 border-b border-gray-100 lg:border-b-0">
+                    <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">AI Chatbot</h1>
+                    <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Chat with your organization's AI assistant</p>
                 </div>
-                <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                        <label htmlFor="document-select" className="text-sm font-medium text-gray-700">
-                            Search in:
-                        </label>
-                        <select
-                            id="document-select"
-                            value={selectedDocument}
-                            onChange={handleDocumentChange}
-                            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                
+                {/* Controls Section */}
+                <div className="px-4 py-3 lg:py-4">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                        {/* Document Selection */}
+                        <div className="flex items-center space-x-2 flex-1 sm:flex-initial">
+                            <label htmlFor="document-select" className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap">
+                                Search in:
+                            </label>
+                            <select
+                                id="document-select"
+                                value={selectedDocument}
+                                onChange={handleDocumentChange}
+                                className="flex-1 sm:min-w-48 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                                <option value="">All Documents</option>
+                                {documents.map((doc) => (
+                                    <option key={doc.id} value={doc.id}>
+                                        {doc.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        
+                        {/* Clear Chat Button */}
+                        <button
+                            onClick={clearChat}
+                            className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-xs sm:text-sm"
                         >
-                            <option value="">All Documents</option>
-                            {documents.map((doc) => (
-                                <option key={doc.id} value={doc.id}>
-                                    {doc.name}
-                                </option>
-                            ))}
-                        </select>
+                            Clear Chat
+                        </button>
                     </div>
-                    <button
-                        onClick={clearChat}
-                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                    >
-                        Clear Chat
-                    </button>
                 </div>
             </div>
 
@@ -228,7 +266,7 @@ const ChatbotsPage = () => {
                             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
                             <div
-                                className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-2 rounded-lg ${
+                                className={`max-w-[85%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-2 rounded-lg ${
                                     message.sender === 'user'
                                         ? 'bg-blue-600 text-white'
                                         : message.sender === 'system'
@@ -254,7 +292,7 @@ const ChatbotsPage = () => {
                     ))}
                     
                     {/* Loading indicator */}
-                    {isLoading && (
+                    {(isLoading || isTyping) && (
                         <div className="flex justify-start">
                             <div className="bg-white text-gray-800 border border-gray-200 px-4 py-2 rounded-lg">
                                 <div className="flex items-center space-x-2">
@@ -263,7 +301,9 @@ const ChatbotsPage = () => {
                                         <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                                         <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                                     </div>
-                                    <span className="text-sm text-gray-500">AI is thinking...</span>
+                                    <span className="text-sm text-gray-500">
+                                        {isLoading ? 'AI is thinking...' : 'AI is typing...'}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -281,8 +321,8 @@ const ChatbotsPage = () => {
                                 type="text"
                                 {...register('message', { required: 'Please enter a message' })}
                                 placeholder="Type your message here..."
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                disabled={isLoading}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                                disabled={isLoading || isTyping}
                             />
                             {errors.message && (
                                 <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
@@ -290,10 +330,10 @@ const ChatbotsPage = () => {
                         </div>
                         <button
                             type="submit"
-                            disabled={isLoading}
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            disabled={isLoading || isTyping}
+                            className="px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                            {isLoading ? (
+                            {(isLoading || isTyping) ? (
                                 <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
