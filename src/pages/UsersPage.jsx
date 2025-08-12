@@ -14,7 +14,7 @@ const UsersPage = () => {
     // Fetch users for the organization
     const fetchUsers = async () => {
         try {
-            const response = await apiClient.get(`user?organization_id=${organization_id}`);
+            const response = await apiClient.get(`user`);
             if (response.data.status === 'success') {
                 setUsers(response.data.data);
             } else {
@@ -43,8 +43,7 @@ const UsersPage = () => {
                 password: formData.password,
                 gender: formData.gender || 'Other',
                 dob: formData.dob || '1990-01-15',
-                is_admin: formData.role === 'admin',
-                organization_id
+                is_admin: formData.role === 'admin'
             };
 
             const response = await apiClient.post('user', userData);

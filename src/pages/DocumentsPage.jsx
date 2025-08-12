@@ -18,7 +18,7 @@ const DocumentsPage = () => {
     // Fetch documents for the organization
     const fetchDocuments = async () => {
         try {
-            const response = await apiClient.get(`doc/${organization_id}`);
+            const response = await apiClient.get(`doc`);
             if (response.data.status === 'success') {
                 setDocuments(response.data.data);
             } else {
@@ -51,7 +51,7 @@ const DocumentsPage = () => {
                 formDataToSend.append('file', file);
             });
 
-            const response = await apiClient.post(`doc/?organization_id=${organization_id}`, formDataToSend, {
+            const response = await apiClient.post(`doc`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
