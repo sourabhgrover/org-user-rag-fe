@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
-import apiClient from '../../utils/apiConfig';
+import apiClient from '../utils/apiConfig';
 
 const ChatbotsPage = () => {
     const [messages, setMessages] = useState([]);

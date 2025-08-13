@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../../utils/apiConfig';
+import apiClient from '../utils/apiConfig';
 
 const DocumentsPage = () => {
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);

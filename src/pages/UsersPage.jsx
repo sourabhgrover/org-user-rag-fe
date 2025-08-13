@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
-import apiClient from '../../utils/apiConfig';
+import apiClient from '../utils/apiConfig';
 
 const UsersPage = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
