@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import Layout from './Layout';
-import apiClient from '../../utils/apiConfig';
+import apiClient from '../utils/apiConfig';
 import useToast from '../hooks/useToast.jsx';
 import { useDispatch } from 'react-redux';
 import { loginFailure, loginStart, loginSuccess } from '../store/slices/authSlice.js';

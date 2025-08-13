@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import apiClient from '../../utils/apiConfig';
+import apiClient from '../utils/apiConfig';
 
 export default function ChatbotWindow() {
     const [messages, setMessages] = useState([]);
