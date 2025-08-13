@@ -42,7 +42,7 @@ apiClient.interceptors.response.use(
             
             // Redirect to login page
             // Use window.location to ensure complete navigation
-            window.location.href = '/login';
+            window.location.href = '/';
             
             // Optional: Show a message to user (you can customize this)
             console.log('Session expired. Please log in again.');
