@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
@@ -214,140 +215,311 @@ const ChatbotsPage = () => {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-120px)]">
-            {/* Header */}
-            <div className="border-b border-gray-200 bg-white">
-                {/* Title Section */}
-                <div className="px-4 py-3 border-b border-gray-100 lg:border-b-0">
-                    <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">AI Chatbot</h1>
-                    <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Chat with your organization's AI assistant</p>
-                </div>
-                
-                {/* Controls Section */}
-                <div className="px-4 py-3 lg:py-4">
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                        {/* Document Selection */}
-                        <div className="flex items-center space-x-2 flex-1 sm:flex-initial">
-                            <label htmlFor="document-select" className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap">
-                                Search in:
-                            </label>
-                            <select
-                                id="document-select"
-                                value={selectedDocument}
-                                onChange={handleDocumentChange}
-                                className="flex-1 sm:min-w-48 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col h-[calc(100vh-120px)] bg-gradient-to-br from-slate-50 to-blue-50"
+        >
+            {/* Clean Header */}
+            <motion.div 
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+                className="bg-white border-b border-gray-200 shadow-sm"
+            >
+                {/* Single Header Row */}
+                <div className="px-4 sm:px-6 py-4">
+                    <div className="flex items-center justify-between">
+                        {/* Left: Title with Bot Icon */}
+                        <div className="flex items-center space-x-3">
+                            <motion.div
+                                initial={{ scale: 0, rotate: -180 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{ delay: 0.3, duration: 0.6, type: "spring" }}
+                                className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md"
                             >
-                                <option value="">All Documents</option>
-                                {documents.map((doc) => (
-                                    <option key={doc.id} value={doc.id}>
-                                        {doc.name}
-                                    </option>
-                                ))}
-                            </select>
+                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M21,8c0,0-1.5-0.5-3.5-0.5S14.5,8,12,8s-3-0.5-5.5-0.5S3,8,3,8v8c0,0,1.5,0.5,3.5,0.5S9.5,16,12,16s3,0.5,5.5,0.5 S21,16,21,16V8z M12,14c-1.5,0-3-0.5-3-2s1.5-2,3-2s3,0.5,3,2S13.5,14,12,14z M12,11c-0.5,0-1,0.2-1,1s0.5,1,1,1s1-0.2,1-1 S12.5,11,12,11z"/>
+                                    <circle cx="8.5" cy="12" r="1"/>
+                                    <circle cx="15.5" cy="12" r="1"/>
+                                </svg>
+                            </motion.div>
+                            <div>
+                                <h1 className="text-lg sm:text-xl font-semibold text-gray-800">
+                                    AI Assistant
+                                </h1>
+                            </div>
                         </div>
                         
-                        {/* Clear Chat Button */}
-                        <button
-                            onClick={clearChat}
-                            className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-xs sm:text-sm"
-                        >
-                            Clear Chat
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Messages Container */}
-            <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-                <div className="max-w-4xl mx-auto space-y-4">
-                    {messages.map((message) => (
-                        <div
-                            key={message.id}
-                            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                        >
-                            <div
-                                className={`max-w-[85%] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-2 rounded-lg ${
-                                    message.sender === 'user'
-                                        ? 'bg-blue-600 text-white'
-                                        : message.sender === 'system'
-                                        ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                                        : 'bg-white text-gray-800 border border-gray-200'
-                                }`}
+                        {/* Right: Controls */}
+                        <div className="flex items-center space-x-3">
+                            {/* Document Selection */}
+                            <motion.div 
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.4, duration: 0.5 }}
+                                className="hidden sm:flex items-center"
                             >
-                                <p className="text-sm md:text-base whitespace-pre-wrap">{message.text}</p>
-                                <p className={`text-xs mt-1 ${
-                                    message.sender === 'user' 
-                                        ? 'text-blue-100' 
-                                        : message.sender === 'system'
-                                        ? 'text-yellow-600'
-                                        : 'text-gray-500'
-                                }`}>
-                                    {new Date(message.timestamp).toLocaleTimeString([], { 
-                                        hour: '2-digit', 
-                                        minute: '2-digit' 
-                                    })}
-                                </p>
-                            </div>
+                                <select
+                                    value={selectedDocument}
+                                    onChange={handleDocumentChange}
+                                    className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white min-w-40"
+                                >
+                                    <option value="">All Documents</option>
+                                    {documents.map((doc) => (
+                                        <option key={doc.id} value={doc.id}>
+                                            {doc.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </motion.div>
+                            
+                            {/* Clear Chat Button */}
+                            <motion.button
+                                initial={{ x: 20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.5, duration: 0.5 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={clearChat}
+                                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </motion.button>
                         </div>
-                    ))}
+                    </div>
                     
-                    {/* Loading indicator */}
-                    {(isLoading || isTyping) && (
-                        <div className="flex justify-start">
-                            <div className="bg-white text-gray-800 border border-gray-200 px-4 py-2 rounded-lg">
-                                <div className="flex items-center space-x-2">
-                                    <div className="flex space-x-1">
-                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                                    </div>
-                                    <span className="text-sm text-gray-500">
-                                        {isLoading ? 'AI is thinking...' : 'AI is typing...'}
-                                    </span>
+                    {/* Mobile Document Selection */}
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        className="sm:hidden mt-3"
+                    >
+                        <select
+                            value={selectedDocument}
+                            onChange={handleDocumentChange}
+                            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white"
+                        >
+                            <option value="">All Documents</option>
+                            {documents.map((doc) => (
+                                <option key={doc.id} value={doc.id}>
+                                    {doc.name}
+                                </option>
+                            ))}
+                        </select>
+                    </motion.div>
+                </div>
+            </motion.div>
+
+            {/* Enhanced Messages Container */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+                <div className="max-w-4xl mx-auto space-y-6">
+                    <AnimatePresence mode="popLayout">
+                        {messages.map((message, index) => (
+                            <motion.div
+                                key={message.id}
+                                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                                transition={{ 
+                                    delay: index * 0.1, 
+                                    duration: 0.4,
+                                    type: "spring",
+                                    stiffness: 100
+                                }}
+                                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                            >
+                                <div className={`flex items-end space-x-3 max-w-[85%] sm:max-w-lg md:max-w-xl`}>
+                                    {/* Bot Avatar */}
+                                    {message.sender === 'bot' && (
+                                        <motion.div
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            transition={{ delay: 0.2 }}
+                                            className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg"
+                                        >
+                                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 2C13.1 2 14 2.9 14 4V8C14 9.1 13.1 10 12 10S10 9.1 10 8V4C10 2.9 10.9 2 12 2ZM21 9V7C21 5.9 20.1 5 19 5S17 5.9 17 7V9C17 10.1 17.9 11 19 11S21 10.1 21 9ZM7 9V7C7 5.9 6.1 5 5 5S3 5.9 3 7V9C3 10.1 3.9 11 5 11S7 10.1 7 9ZM17.7 14.3C17.3 13.9 16.7 13.9 16.3 14.3L12 18.6L7.7 14.3C7.3 13.9 6.7 13.9 6.3 14.3S5.9 15.3 6.3 15.7L11.3 20.7C11.7 21.1 12.3 21.1 12.7 20.7L17.7 15.7C18.1 15.3 18.1 14.7 17.7 14.3Z"/>
+                                            </svg>
+                                        </motion.div>
+                                    )}
+                                    
+                                    {/* Message Bubble */}
+                                    <motion.div
+                                        whileHover={{ scale: 1.02 }}
+                                        className={`relative px-4 py-3 rounded-2xl shadow-sm ${
+                                            message.sender === 'user'
+                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white ml-auto'
+                                                : message.sender === 'system'
+                                                ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border border-amber-200'
+                                                : 'bg-white text-gray-800 border border-gray-200 shadow-md'
+                                        }`}
+                                    >
+                                        {/* Message tail */}
+                                        <div className={`absolute w-0 h-0 ${
+                                            message.sender === 'user' 
+                                                ? 'right-0 top-4 border-l-8 border-l-blue-500 border-t-4 border-t-transparent border-b-4 border-b-transparent transform translate-x-2'
+                                                : 'left-0 top-4 border-r-8 border-r-white border-t-4 border-t-transparent border-b-4 border-b-transparent transform -translate-x-2'
+                                        }`} />
+                                        
+                                        <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                                            {message.text}
+                                        </p>
+                                        <p className={`text-xs mt-2 opacity-70 ${
+                                            message.sender === 'user' 
+                                                ? 'text-blue-100' 
+                                                : message.sender === 'system'
+                                                ? 'text-amber-600'
+                                                : 'text-gray-500'
+                                        }`}>
+                                            {new Date(message.timestamp).toLocaleTimeString([], { 
+                                                hour: '2-digit', 
+                                                minute: '2-digit' 
+                                            })}
+                                        </p>
+                                    </motion.div>
+                                    
+                                    {/* User Avatar */}
+                                    {message.sender === 'user' && (
+                                        <motion.div
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            transition={{ delay: 0.2 }}
+                                            className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center shadow-lg"
+                                        >
+                                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                            </svg>
+                                        </motion.div>
+                                    )}
                                 </div>
-                            </div>
-                        </div>
-                    )}
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                    
+                    {/* Enhanced Loading indicator */}
+                    <AnimatePresence>
+                        {(isLoading || isTyping) && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                className="flex justify-start"
+                            >
+                                <div className="flex items-end space-x-3">
+                                    <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2C13.1 2 14 2.9 14 4V8C14 9.1 13.1 10 12 10S10 9.1 10 8V4C10 2.9 10.9 2 12 2ZM21 9V7C21 5.9 20.1 5 19 5S17 5.9 17 7V9C17 10.1 17.9 11 19 11S21 10.1 21 9ZM7 9V7C7 5.9 6.1 5 5 5S3 5.9 3 7V9C3 10.1 3.9 11 5 11S7 10.1 7 9ZM17.7 14.3C17.3 13.9 16.7 13.9 16.3 14.3L12 18.6L7.7 14.3C7.3 13.9 6.7 13.9 6.3 14.3S5.9 15.3 6.3 15.7L11.3 20.7C11.7 21.1 12.3 21.1 12.7 20.7L17.7 15.7C18.1 15.3 18.1 14.7 17.7 14.3Z"/>
+                                        </svg>
+                                    </div>
+                                    <div className="bg-white text-gray-800 border border-gray-200 px-4 py-3 rounded-2xl shadow-md">
+                                        <div className="flex items-center space-x-3">
+                                            <div className="flex space-x-1">
+                                                <motion.div
+                                                    animate={{ y: [0, -8, 0] }}
+                                                    transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                                                    className="w-2 h-2 bg-blue-500 rounded-full"
+                                                />
+                                                <motion.div
+                                                    animate={{ y: [0, -8, 0] }}
+                                                    transition={{ duration: 0.6, repeat: Infinity, delay: 0.1 }}
+                                                    className="w-2 h-2 bg-blue-500 rounded-full"
+                                                />
+                                                <motion.div
+                                                    animate={{ y: [0, -8, 0] }}
+                                                    transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                                                    className="w-2 h-2 bg-blue-500 rounded-full"
+                                                />
+                                            </div>
+                                            <span className="text-sm text-gray-600 font-medium">
+                                                {isLoading ? 'AI is thinking...' : 'AI is typing...'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                     <div ref={messagesEndRef} />
                 </div>
             </div>
 
-            {/* Message Input */}
-            <div className="border-t border-gray-200 bg-white p-4">
-                <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto">
-                    <div className="flex space-x-3">
-                        <div className="flex-1">
-                            <input
-                                type="text"
-                                {...register('message', { required: 'Please enter a message' })}
-                                placeholder="Type your message here..."
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-                                disabled={isLoading || isTyping}
-                            />
-                            {errors.message && (
-                                <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
-                            )}
+            {/* Enhanced Message Input */}
+            <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="relative bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-4 sm:p-6"
+            >
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
+                <form onSubmit={handleSubmit(onSubmit)} className="relative max-w-4xl mx-auto">
+                    <div className="flex items-end space-x-3">
+                        <div className="flex-1 relative">
+                            <motion.div
+                                whileFocus={{ scale: 1.02 }}
+                                className="relative"
+                            >
+                                <input
+                                    type="text"
+                                    {...register('message', { required: 'Please enter a message' })}
+                                    placeholder="Ask me anything about your documents..."
+                                    className="w-full px-6 py-4 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 text-gray-800 placeholder-gray-500 shadow-sm transition-all duration-200 text-sm sm:text-base"
+                                    disabled={isLoading || isTyping}
+                                />
+                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+                            </motion.div>
+                            <AnimatePresence>
+                                {errors.message && (
+                                    <motion.p 
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="mt-2 text-sm text-red-500 font-medium"
+                                    >
+                                        {errors.message.message}
+                                    </motion.p>
+                                )}
+                            </AnimatePresence>
                         </div>
-                        <button
+                        <motion.button
                             type="submit"
                             disabled={isLoading || isTyping}
-                            className="px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="group relative p-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:cursor-not-allowed"
                         >
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                             {(isLoading || isTyping) ? (
-                                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <motion.svg 
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                    className="w-5 h-5 sm:w-6 sm:h-6" 
+                                    fill="none" 
+                                    viewBox="0 0 24 24"
+                                >
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
+                                </motion.svg>
                             ) : (
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <motion.svg 
+                                    whileHover={{ x: 2 }}
+                                    className="w-5 h-5 sm:w-6 sm:h-6" 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                >
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                </svg>
+                                </motion.svg>
                             )}
-                        </button>
+                        </motion.button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 };
 
